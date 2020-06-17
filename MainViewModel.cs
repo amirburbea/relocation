@@ -56,7 +56,7 @@ namespace Relocation
                     categories.Add(categoryName, category = new CategoryModel(categoryName));
                     category.PointsChanged += this.Category_PointsChanged;
                 }
-                category.CreateItem(fields[1].Trim(), int.Parse(fields[2].Trim()));
+                category.AddItem(fields[1].Trim(), int.Parse(fields[2].Trim()));
             }
             return categories.Values;
         }

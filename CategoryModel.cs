@@ -27,7 +27,7 @@ namespace Relocation
             }
         }
 
-        internal void CreateItem(string description, int points)
+        internal void AddItem(string description, int points)
         {
             ItemModel model = new ItemModel(this, description, points);
             model.IsSelectedChanged += this.Item_IsSelectedChanged;
