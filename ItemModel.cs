@@ -2,7 +2,7 @@
 
 namespace Relocation
 {
-    public sealed class ItemModel
+    public sealed class ItemModel : ModelBase
     {
         private bool _isSelected;
 
@@ -20,11 +20,7 @@ namespace Relocation
         public bool IsSelected
         {
             get => this._isSelected;
-            set
-            {
-                this._isSelected = value;
-                this.IsSelectedChanged?.Invoke(this, EventArgs.Empty);
-            }
+            set => this.SetValue(ref this._isSelected, value, this.IsSelectedChanged);
         }
 
         public int Points { get; }

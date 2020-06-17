@@ -9,7 +9,7 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace Relocation
 {
-    public sealed class MainViewModel
+    public sealed class MainViewModel : ModelBase
     {
         private int _points;
 
@@ -27,11 +27,7 @@ namespace Relocation
         public int Points
         {
             get => this._points;
-            private set
-            {
-                this._points = value;
-                this.PointsChanged?.Invoke(this, EventArgs.Empty);
-            }
+            private set => this.SetValue(ref this._points, value, this.PointsChanged);
         }
 
         private void Category_PointsChanged(object? sender, EventArgs e) => this.Points = this.Categories.Sum(item => item.Points);

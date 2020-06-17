@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Relocation
 {
-    public sealed class CategoryModel
+    public sealed class CategoryModel : ModelBase
     {
         private readonly List<ItemModel> _items = new List<ItemModel>();
         private int _points;
@@ -20,11 +20,7 @@ namespace Relocation
         public int Points
         {
             get => _points;
-            private set
-            {
-                this._points = value;
-                this.PointsChanged?.Invoke(this, EventArgs.Empty);
-            }
+            private set => this.SetValue(ref this._points, value, this.PointsChanged);
         }
 
         internal void AddItem(string description, int points)
