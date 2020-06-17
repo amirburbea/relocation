@@ -11,7 +11,7 @@ namespace Relocation
             (this.Category, this.Description, this.Points) = (category, description, points);
         }
 
-        public event EventHandler IsSelectedChanged;
+        public event EventHandler? IsSelectedChanged;
 
         public CategoryModel Category { get; }
 

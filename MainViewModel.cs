@@ -15,13 +15,12 @@ namespace Relocation
 
         public MainViewModel()
         {
-            if (!(bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue)
-            {
-                this.Categories = this.CreateCategories().ToArray();
-            }
+            this.Categories = (bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue
+                ? Array.Empty<CategoryModel>()
+                : this.CreateCategories().ToArray();
         }
 
-        public event EventHandler PointsChanged;
+        public event EventHandler? PointsChanged;
 
         public IReadOnlyList<CategoryModel> Categories { get; }
 
@@ -35,10 +34,7 @@ namespace Relocation
             }
         }
 
-        private void Category_PointsChanged(object sender, EventArgs e)
-        {
-            this.Points = this.Categories.Sum(item => item.Points);
-        }
+        private void Category_PointsChanged(object? sender, EventArgs e) => this.Points = this.Categories.Sum(item => item.Points);
 
         private IEnumerable<CategoryModel> CreateCategories()
         {
@@ -49,13 +45,13 @@ namespace Relocation
             Dictionary<string, CategoryModel> categories = new Dictionary<string, CategoryModel>();
             while (true)
             {
-                string[] fields = parser.ReadFields();
+                string[]? fields = parser.ReadFields();
                 if (fields == null || fields.Length != 3)
                 {
                     break;
                 }
                 string categoryName = fields[0].Trim();
-                if (!categories.TryGetValue(categoryName, out CategoryModel category))
+                if (!categories.TryGetValue(categoryName, out CategoryModel? category))
                 {
                     categories.Add(categoryName, category = new CategoryModel(categoryName));
                     category.PointsChanged += this.Category_PointsChanged;

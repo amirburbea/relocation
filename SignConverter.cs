@@ -7,10 +7,9 @@ namespace Relocation
 {
     public sealed class SignConverter : IValueConverter
     {
-        private static readonly object _zero = 0;
-        private static readonly object _one = 1;
         private static readonly object _negativeOne = -1;
-
+        private static readonly object _one = 1;
+        private static readonly object _zero = 0;
 
         object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
