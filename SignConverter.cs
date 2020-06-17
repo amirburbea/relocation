@@ -13,17 +13,19 @@ namespace Relocation
 
         object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !(value is int number) ? DependencyProperty.UnsetValue : Math.Sign(number) switch
-            {
-                1 => _one,
-                -1 => _negativeOne,
-                _ => _zero
-            };
+            return value is int number ? SignConverter.GetSign(number) : DependencyProperty.UnsetValue;
         }
 
         object IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
+
+        private static object GetSign(int number) => Math.Sign(number) switch
+        {
+            1 => _one,
+            -1 => _negativeOne,
+            _ => _zero
+        };
     }
 }

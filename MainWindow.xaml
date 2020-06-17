@@ -20,9 +20,11 @@
                     <Run Text="{Binding Points, StringFormat='({0})', Mode=OneWay}" />
                 </TextBlock>
             </HierarchicalDataTemplate>
-            <local:TooManyPointsConverter x:Key="TooManyPointsConverter" />
-            <local:SignConverter x:Key="SignConverter" />
             <DataTemplate DataType="{x:Type local:ItemModel}">
+                <DataTemplate.Resources>
+                    <local:TooManyPointsConverter x:Key="TooManyPointsConverter" />
+                    <local:SignConverter x:Key="SignConverter" />
+                </DataTemplate.Resources>
                 <StackPanel Orientation="Horizontal">
                     <StackPanel.Style>
                         <Style TargetType="{x:Type StackPanel}">
@@ -56,7 +58,7 @@
                         </Style>
                     </StackPanel.Style>
                     <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Center" Margin="2,0" FocusVisualStyle="{x:Null}" />
-                    <TextBlock  VerticalAlignment="Center" >
+                    <TextBlock VerticalAlignment="Center" >
                         <Run Text="{Binding Description, Mode=OneTime}" />
                         <Run Text="{Binding Points, Mode=OneTime, StringFormat='({0})'}" />
                     </TextBlock>
@@ -74,7 +76,7 @@
         <TreeView ItemsSource="{Binding Categories}" FocusVisualStyle="{x:Null}" BorderThickness="0" />
         <TextBlock Grid.Row="1" Padding="3" Background="{x:Static SystemColors.ControlBrush}">
             <TextBlock.Text>
-                <MultiBinding StringFormat="{}{0}/{1}">
+                <MultiBinding StringFormat="{}{0}/{1} Points">
                     <Binding Path="Points" />
                     <Binding Source="{x:Static local:Constants.MaxPoints}" Mode="OneTime" />
                 </MultiBinding>
