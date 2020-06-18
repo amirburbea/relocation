@@ -12,15 +12,9 @@
     <Window.DataContext>
         <Binding Source="{StaticResource ViewModel}" />
     </Window.DataContext>
-    <Grid>
+    <Grid Background="{x:Static SystemColors.ControlBrush}">
         <Grid.Resources>
-            <HierarchicalDataTemplate DataType="{x:Type local:CategoryModel}" ItemsSource="{Binding Items}">
-                <TextBlock>
-                    <Run Text="{Binding Name, Mode=OneTime}" FontWeight="SemiBold" />
-                    <Run Text="{Binding Points, StringFormat='({0})', Mode=OneWay}" />
-                </TextBlock>
-            </HierarchicalDataTemplate>
-            <DataTemplate DataType="{x:Type local:ItemModel}">
+            <DataTemplate x:Key="ItemTemplate" DataType="{x:Type local:ItemModel}">
                 <DataTemplate.Resources>
                     <local:TooManyPointsConverter x:Key="TooManyPointsConverter" />
                     <local:SignConverter x:Key="SignConverter" />
@@ -63,6 +57,12 @@
                     </TextBlock>
                 </CheckBox>
             </DataTemplate>
+            <HierarchicalDataTemplate DataType="{x:Type local:CategoryModel}" ItemsSource="{Binding Items}" ItemTemplate="{StaticResource ItemTemplate}">
+                <TextBlock>
+                    <Run Text="{Binding Name, Mode=OneTime}" FontWeight="SemiBold" />
+                    <Run Text="{Binding Points, StringFormat='({0})', Mode=OneWay}" />
+                </TextBlock>
+            </HierarchicalDataTemplate>
             <Style TargetType="{x:Type TreeViewItem}">
                 <Setter Property="IsExpanded" Value="True" />
                 <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -73,8 +73,12 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TreeView ItemsSource="{Binding Categories}" FocusVisualStyle="{x:Null}" BorderThickness="0" />
-        <TextBlock Grid.Row="1" Padding="3" Background="{x:Static SystemColors.ControlBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TreeView Background="{x:Static SystemColors.WindowBrush}" Grid.ColumnSpan="2" ItemsSource="{Binding Categories}" FocusVisualStyle="{x:Null}" BorderThickness="0" />
+        <TextBlock Grid.Row="1" Padding="3" >
             <TextBlock.Text>
                 <MultiBinding StringFormat="{}{0}/{1} Points">
                     <Binding Path="Points" />
@@ -82,5 +86,16 @@
                 </MultiBinding>
             </TextBlock.Text>
         </TextBlock>
+        <Button Grid.Row="1" Grid.Column="1" Margin="2" Content="Clear All" FocusVisualStyle="{x:Null}" Click="ClearAll_Click">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Points}" Value="0">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
     </Grid>
 </Window>
