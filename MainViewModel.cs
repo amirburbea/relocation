@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -15,24 +16,38 @@ namespace Relocation
 
         public MainViewModel()
         {
-            this.Categories = (bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue
-                ? Array.Empty<CategoryModel>()
-                : this.CreateCategories().ToArray();
+            this.Categories = Array.AsReadOnly(
+                (bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue
+                    ? Array.Empty<CategoryModel>()
+                    : this.CreateCategories()
+            );
+            this.ClearAllCommand = new DelegateCommand(this.ClearAll, () => this.Points != 0);
         }
 
-        public event EventHandler? PointsChanged;
+        public ReadOnlyCollection<CategoryModel> Categories { get; }
 
-        public IReadOnlyList<CategoryModel> Categories { get; }
+        public DelegateCommand ClearAllCommand { get; }
 
         public int Points
         {
             get => this._points;
-            private set => this.SetValue(ref this._points, value, this.PointsChanged);
+            private set => this.SetValue(ref this._points, value);
         }
 
-        private void Category_PointsChanged(object? sender, EventArgs e) => this.Points = this.Categories.Sum(item => item.Points);
+        private void Category_PointsChanged(object? sender, EventArgs e) => this.Points = this.Categories.Sum(category => category.Points);
 
-        private IEnumerable<CategoryModel> CreateCategories()
+        private void ClearAll()
+        {
+            foreach (ItemModel? item in this.Categories.Select(category => category.SelectedItem))
+            {
+                if (item != null)
+                {
+                    item.IsSelected = false;
+                }
+            }
+        }
+
+        private CategoryModel[] CreateCategories()
         {
             Uri uri = new Uri($"pack://application:,,,/{Assembly.GetExecutingAssembly().GetName().Name};component/items.csv");
             using Stream stream = Application.GetResourceStream(uri).Stream;
@@ -50,11 +65,11 @@ namespace Relocation
                 if (!categories.TryGetValue(categoryName, out CategoryModel? category))
                 {
                     categories.Add(categoryName, category = new CategoryModel(categoryName));
-                    category.PointsChanged += this.Category_PointsChanged;
+                    PropertyChangedEventManager.AddHandler(category, this.Category_PointsChanged, nameof(category.Points));
                 }
                 category.AddItem(fields[1].Trim(), int.Parse(fields[2].Trim()));
             }
-            return categories.Values;
+            return categories.Values.ToArray();
         }
     }
 }

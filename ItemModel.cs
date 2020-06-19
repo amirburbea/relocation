@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Relocation
+﻿namespace Relocation
 {
     public sealed class ItemModel : ModelBase
     {
@@ -11,8 +9,6 @@ namespace Relocation
             (this.Category, this.Description, this.Points) = (category, description, points);
         }
 
-        public event EventHandler? IsSelectedChanged;
-
         public CategoryModel Category { get; }
 
         public string Description { get; }
@@ -20,7 +16,7 @@ namespace Relocation
         public bool IsSelected
         {
             get => this._isSelected;
-            set => this.SetValue(ref this._isSelected, value, this.IsSelectedChanged);
+            set => this.SetValue(ref this._isSelected, value);
         }
 
         public int Points { get; }

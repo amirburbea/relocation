@@ -1,18 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Relocation
 {
-    public abstract class ModelBase
+    public abstract class ModelBase : INotifyPropertyChanged
     {
-        protected void SetValue<T>(ref T field, T value, EventHandler? eventHandler)
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected bool SetValue<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<T>.Default.Equals(field, value))
             {
-                return;
+                return false;
             }
             field = value;
-            eventHandler?.Invoke(this, EventArgs.Empty);
+            this.OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }

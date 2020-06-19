@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Relocation
@@ -7,33 +8,52 @@ namespace Relocation
     public sealed class CategoryModel : ModelBase
     {
         private readonly List<ItemModel> _items = new List<ItemModel>();
-        private int _points;
+        private ItemModel? _selectedItem;
 
         public CategoryModel(string name) => this.Name = name;
-
-        public event EventHandler? PointsChanged;
 
         public IReadOnlyList<ItemModel> Items => this._items;
 
         public string Name { get; }
 
-        public int Points
+        public int Points => this._selectedItem == null ? 0 : this._selectedItem.Points;
+
+        public ItemModel? SelectedItem
         {
-            get => _points;
-            private set => this.SetValue(ref this._points, value, this.PointsChanged);
+            get => this._selectedItem;
+            private set
+            {
+                if (this.SetValue(ref this._selectedItem, value))
+                {
+                    this.OnPropertyChanged(nameof(this.Points));
+                }
+            }
         }
 
         internal void AddItem(string description, int points)
         {
-            ItemModel model = new ItemModel(this, description, points);
-            model.IsSelectedChanged += this.Item_IsSelectedChanged;
-            this._items.Add(model);
+            ItemModel item = new ItemModel(this, description, points);
+            PropertyChangedEventManager.AddHandler(item, this.Item_IsSelectedChanged, nameof(item.IsSelected));
+            this._items.Add(item);
         }
 
         private void Item_IsSelectedChanged([DisallowNull] object? sender, EventArgs e)
         {
             ItemModel item = (ItemModel)sender;
-            this.Points += (item.IsSelected ? 1 : -1) * item.Points;
+            if (item.IsSelected)
+            {
+                if (this._selectedItem != null)
+                {
+                    PropertyChangedEventManager.RemoveHandler(this._selectedItem, this.Item_IsSelectedChanged, nameof(item.IsSelected));
+                    this._selectedItem.IsSelected = false;
+                    PropertyChangedEventManager.AddHandler(this._selectedItem, this.Item_IsSelectedChanged, nameof(item.IsSelected));
+                }
+                this.SelectedItem = item;
+            }
+            else if (item == this._selectedItem)
+            {
+                this.SelectedItem = null;
+            }
         }
     }
 }

@@ -12,8 +12,8 @@ namespace Relocation
 
         object IMultiValueConverter.Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            return values.Length >= 2 && values[0] is int left && values[1] is int right
-                ? left + right > Constants.MaxPoints ? TooManyPointsConverter._true : TooManyPointsConverter._false
+            return values.Length >= 2 && values[0] is int points && values[1] is ItemModel item
+                ? points + item.Points - item.Category.Points > Constants.MaxPoints ? TooManyPointsConverter._true : TooManyPointsConverter._false
                 : DependencyProperty.UnsetValue;
         }
 
