@@ -35,13 +35,16 @@ namespace Relocation
 
         private void ClearAll()
         {
-            foreach (ItemModel? item in this.Categories.Select(category => category.SelectedItem))
+            foreach (CategoryModel category in this.Categories)
             {
-                if (item != null)
+                if (category.SelectedItem is ItemModel item)
                 {
+                    PropertyChangedEventManager.RemoveHandler(category, this.Category_PointsChanged, nameof(category.Points));
                     item.IsSelected = false;
+                    PropertyChangedEventManager.AddHandler(category, this.Category_PointsChanged, nameof(category.Points));
                 }
             }
+            this.Points = 0;
         }
 
         private CategoryModel[] CreateCategories()
