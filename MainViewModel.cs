@@ -15,9 +15,7 @@ namespace Relocation
 
         public MainViewModel()
         {
-            this.Categories = (bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue
-                ? Array.Empty<CategoryModel>()
-                : this.CreateCategories();
+            this.Categories = this.CreateCategories();
             this.ClearAllCommand = new DelegateCommand(this.ClearAll, () => this.Points != 0);
         }
 
@@ -49,25 +47,28 @@ namespace Relocation
 
         private CategoryModel[] CreateCategories()
         {
-            Uri uri = new Uri($"pack://application:,,,/{Assembly.GetExecutingAssembly().GetName().Name};component/items.csv");
-            using Stream stream = Application.GetResourceStream(uri).Stream;
-            using TextFieldParser parser = new TextFieldParser(stream) { Delimiters = new[] { "," } };
-            parser.ReadLine(); // Headers
             Dictionary<string, CategoryModel> categories = new Dictionary<string, CategoryModel>();
-            while (true)
+            if (!(bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue)
             {
-                string[]? fields = parser.ReadFields();
-                if (fields == null || fields.Length != 3)
+                Uri uri = new Uri($"pack://application:,,,/{Assembly.GetExecutingAssembly().GetName().Name};component/items.csv");
+                using Stream stream = Application.GetResourceStream(uri).Stream;
+                using TextFieldParser parser = new TextFieldParser(stream) { Delimiters = new[] { "," } };
+                parser.ReadLine(); // Headers
+                while (true)
                 {
-                    break;
+                    string[]? fields = parser.ReadFields();
+                    if (fields == null || fields.Length != 3)
+                    {
+                        break;
+                    }
+                    string categoryName = fields[0].Trim();
+                    if (!categories.TryGetValue(categoryName, out CategoryModel? category))
+                    {
+                        categories.Add(categoryName, category = new CategoryModel(categoryName));
+                        PropertyChangedEventManager.AddHandler(category, this.Category_PointsChanged, nameof(category.Points));
+                    }
+                    category.AddItem(fields[1].Trim(), int.Parse(fields[2].Trim()));
                 }
-                string categoryName = fields[0].Trim();
-                if (!categories.TryGetValue(categoryName, out CategoryModel? category))
-                {
-                    categories.Add(categoryName, category = new CategoryModel(categoryName));
-                    PropertyChangedEventManager.AddHandler(category, this.Category_PointsChanged, nameof(category.Points));
-                }
-                category.AddItem(fields[1].Trim(), int.Parse(fields[2].Trim()));
             }
             return categories.Values.ToArray();
         }

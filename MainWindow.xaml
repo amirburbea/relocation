@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:Relocation"
     mc:Ignorable="d" d:DataContext="{d:DesignInstance {x:Type local:MainViewModel}}"
-    Title="Relocation Options" Height="550" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    Title="Relocation Options" Height="530" Width="250" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ObjectDataProvider x:Key="ViewModel" ObjectType="{x:Type local:MainViewModel}" />
     </Window.Resources>
@@ -51,17 +51,11 @@
             <ColumnDefinition />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <TreeView BorderThickness="0" Background="{x:Static SystemColors.WindowBrush}" FocusVisualStyle="{x:Null}" Grid.ColumnSpan="2" 
+        <TreeView Grid.ColumnSpan="2" FocusVisualStyle="{x:Null}" Background="{x:Static SystemColors.WindowBrush}" 
             ItemsSource="{Binding Categories, Mode=OneTime}" />
-        <TextBlock Grid.Row="1" Padding="3" >
-            <TextBlock.Text>
-                <MultiBinding StringFormat="{}{0}/{1} Points">
-                    <Binding Path="Points" />
-                    <Binding Source="{x:Static local:Constants.MaxPoints}" Mode="OneTime" />
-                </MultiBinding>
-            </TextBlock.Text>
-        </TextBlock>
-        <Button Grid.Row="1" Grid.Column="1" Margin="2" Content="Clear All" FocusVisualStyle="{x:Null}" 
+        <TextBlock Grid.Row="1" Padding="3" 
+            Text="{Binding Points, StringFormat='{}{0}/78'}" />
+        <Button Grid.Row="1" Grid.Column="1" FocusVisualStyle="{x:Null}" Margin="2" Content="Clear All" 
             Command="{Binding ClearAllCommand, Mode=OneTime}" />
     </Grid>
 </Window>
