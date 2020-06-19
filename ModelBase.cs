@@ -6,6 +6,10 @@ namespace Relocation
 {
     public abstract class ModelBase : INotifyPropertyChanged
     {
+        protected ModelBase()
+        {
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
