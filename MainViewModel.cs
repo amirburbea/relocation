@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -16,15 +15,13 @@ namespace Relocation
 
         public MainViewModel()
         {
-            this.Categories = Array.AsReadOnly(
-                (bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue
-                    ? Array.Empty<CategoryModel>()
-                    : this.CreateCategories()
-            );
+            this.Categories = (bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue
+                ? Array.Empty<CategoryModel>()
+                : this.CreateCategories();
             this.ClearAllCommand = new DelegateCommand(this.ClearAll, () => this.Points != 0);
         }
 
-        public ReadOnlyCollection<CategoryModel> Categories { get; }
+        public IReadOnlyList<CategoryModel> Categories { get; }
 
         public DelegateCommand ClearAllCommand { get; }
 

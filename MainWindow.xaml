@@ -16,26 +16,15 @@
         <Grid.Resources>
             <DataTemplate DataType="{x:Type local:ItemModel}">
                 <DataTemplate.Resources>
-                    <local:TooManyPointsConverter x:Key="TooManyPointsConverter" />
+                    <local:ItemEnabledConverter x:Key="ItemEnabledConverter" />
                 </DataTemplate.Resources>
                 <CheckBox IsChecked="{Binding IsSelected}" FocusVisualStyle="{x:Null}" Cursor="Hand">
-                    <CheckBox.Style>
-                        <Style TargetType="{x:Type CheckBox}">
-                            <Style.Triggers>
-                                <DataTrigger Value="True">
-                                    <DataTrigger.Binding>
-                                        <MultiBinding Converter="{StaticResource TooManyPointsConverter}">
-                                            <Binding Path="Points" Source="{StaticResource ViewModel}" />
-                                            <Binding />
-                                        </MultiBinding>
-                                    </DataTrigger.Binding>
-                                    <Setter Property="IsEnabled" Value="False" />
-                                    <Setter Property="Opacity" Value="0.66" />
-                                    <Setter Property="IsHitTestVisible" Value="False" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </CheckBox.Style>
+                    <CheckBox.IsEnabled>
+                        <MultiBinding Converter="{StaticResource ItemEnabledConverter}">
+                            <Binding />
+                            <Binding Path="Points" Source="{StaticResource ViewModel}" />
+                        </MultiBinding>
+                    </CheckBox.IsEnabled>
                     <TextBlock>
                         <Run Text="{Binding Description, Mode=OneTime}" />
                         <Run Text="{Binding Points, Mode=OneTime, StringFormat='({0})'}" />
