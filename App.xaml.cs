@@ -1,6 +1,5 @@
-﻿namespace Relocation
+﻿namespace Relocation;
+
+partial class App
 {
-    partial class App
-    {
-    }
 }

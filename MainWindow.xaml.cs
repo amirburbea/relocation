@@ -1,7 +1,6 @@
-﻿namespace Relocation
+﻿namespace Relocation;
+
+partial class MainWindow
 {
-    partial class MainWindow
-    {
-        public MainWindow() => this.InitializeComponent();
-    }
+    public MainWindow() => this.InitializeComponent();
 }

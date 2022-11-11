@@ -7,70 +7,67 @@ using System.Reflection;
 using System.Windows;
 using Microsoft.VisualBasic.FileIO;
 
-namespace Relocation
+namespace Relocation;
+
+public sealed class MainViewModel : ModelBase
 {
-    public sealed class MainViewModel : ModelBase
+    private int _points;
+
+    public MainViewModel()
     {
-        private int _points;
+        this.Categories = this.CreateCategories();
+        this.ClearAllCommand = new DelegateCommand(this.ClearAll, () => this.Points != 0);
+    }
 
-        public MainViewModel()
+    public IReadOnlyList<CategoryModel> Categories { get; }
+
+    public DelegateCommand ClearAllCommand { get; }
+
+    public int Points
+    {
+        get => this._points;
+        private set => this.SetValue(ref this._points, value);
+    }
+
+    private void Category_PointsChanged(object? sender, EventArgs e) => this.Points = this.Categories.Sum(category => category.Points);
+
+    private void ClearAll()
+    {
+        foreach (CategoryModel category in this.Categories)
         {
-            this.Categories = this.CreateCategories();
-            this.ClearAllCommand = new DelegateCommand(this.ClearAll, () => this.Points != 0);
-        }
-
-        public IReadOnlyList<CategoryModel> Categories { get; }
-
-        public DelegateCommand ClearAllCommand { get; }
-
-        public int Points
-        {
-            get => this._points;
-            private set => this.SetValue(ref this._points, value);
-        }
-
-        private void Category_PointsChanged(object? sender, EventArgs e) => this.Points = this.Categories.Sum(category => category.Points);
-
-        private void ClearAll()
-        {
-            foreach (CategoryModel category in this.Categories)
+            if (category.SelectedItem is { } item)
             {
-                if (category.SelectedItem is ItemModel item)
-                {
-                    PropertyChangedEventManager.RemoveHandler(category, this.Category_PointsChanged, nameof(category.Points));
-                    item.IsSelected = false;
-                    PropertyChangedEventManager.AddHandler(category, this.Category_PointsChanged, nameof(category.Points));
-                }
+                PropertyChangedEventManager.RemoveHandler(category, this.Category_PointsChanged, nameof(category.Points));
+                item.IsSelected = false;
+                PropertyChangedEventManager.AddHandler(category, this.Category_PointsChanged, nameof(category.Points));
             }
-            this.Points = 0;
         }
+        this.Points = 0;
+    }
 
-        private CategoryModel[] CreateCategories()
+    private CategoryModel[] CreateCategories()
+    {
+        Dictionary<string, CategoryModel> categories = new();
+        if (!(bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue)
         {
-            Dictionary<string, CategoryModel> categories = new Dictionary<string, CategoryModel>();
-            if (!(bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(Window)).DefaultValue)
+            Uri uri = new($"pack://application:,,,/{Assembly.GetExecutingAssembly().GetName().Name};component/items.csv");
+            using Stream stream = Application.GetResourceStream(uri).Stream;
+            using TextFieldParser parser = new(stream) { Delimiters = new[] { "," } };
+            parser.ReadLine(); // Headers
+            while (true)
             {
-                Uri uri = new Uri($"pack://application:,,,/{Assembly.GetExecutingAssembly().GetName().Name};component/items.csv");
-                using Stream stream = Application.GetResourceStream(uri).Stream;
-                using TextFieldParser parser = new TextFieldParser(stream) { Delimiters = new[] { "," } };
-                parser.ReadLine(); // Headers
-                while (true)
+                if (parser.ReadFields() is not [string category, string description, string points])
                 {
-                    string[]? fields = parser.ReadFields();
-                    if (fields == null || fields.Length != 3)
-                    {
-                        break;
-                    }
-                    string categoryName = fields[0].Trim();
-                    if (!categories.TryGetValue(categoryName, out CategoryModel? category))
-                    {
-                        categories.Add(categoryName, category = new CategoryModel(categoryName));
-                        PropertyChangedEventManager.AddHandler(category, this.Category_PointsChanged, nameof(category.Points));
-                    }
-                    category.AddItem(fields[1].Trim(), int.Parse(fields[2].Trim()));
+                    break;
                 }
+                if (!categories.TryGetValue(category, out CategoryModel? model))
+                {
+                    categories.Add(category, model = new(category));
+                    PropertyChangedEventManager.AddHandler(model, this.Category_PointsChanged, nameof(model.Points));
+                }
+                model.AddItem(description, int.Parse(points));
             }
-            return categories.Values.ToArray();
         }
+        return categories.Values.ToArray();
     }
 }
